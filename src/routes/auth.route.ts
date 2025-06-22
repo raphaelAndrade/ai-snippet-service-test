@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { mockUsers } from '../data/mock-users';
 
 const router = Router();
-// @ts-ignore
+// @ts-expect-error: imported type is incompatible with Express route typing
 router.post('/login', (req: Request, res: Response) => {
   const { email, code } = req.body;
 

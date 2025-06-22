@@ -30,7 +30,8 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
 
     req.user = decoded;
     next();
-  } catch (err) {
+  } catch (error) {
+    console.error('Error authenticating user:', error);
     res.status(403).json({ error: 'Invalid or expired token' });
   }
 }

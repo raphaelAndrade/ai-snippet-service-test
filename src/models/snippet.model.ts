@@ -1,9 +1,20 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-const snippetSchema = new mongoose.Schema({
-  text: { type: String, required: true },
-  summary: { type: String, required: true },
-  ownerEmail: { type: String, required: true }
-}, { timestamps: true });
+interface SnippetDocument extends Document {
+  text: string;
+  summary: string;
+  ownerEmail: string;
+}
 
-export default mongoose.model('Snippet', snippetSchema);
+const snippetSchema = new Schema<SnippetDocument>(
+  {
+    text: { type: String, required: true },
+    summary: { type: String, required: true },
+    ownerEmail: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+const Snippet = mongoose.model<SnippetDocument>('Snippet', snippetSchema);
+
+export default Snippet;

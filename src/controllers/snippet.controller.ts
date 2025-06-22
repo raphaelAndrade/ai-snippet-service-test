@@ -35,7 +35,8 @@ export const getSnippet = async (req: AuthRequest, res: Response) => {
       text: snippet.text,
       summary: snippet.summary,
     });
-  } catch (err) {
+  } catch (error) {
+    console.error('get snippet Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -76,7 +77,8 @@ export const listSnippets = async (req: AuthRequest, res: Response) => {
         summary: s.summary,
       }))
     );
-  } catch (err) {
+  } catch (error) {
+    console.error('Error list snippet:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
