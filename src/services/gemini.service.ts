@@ -16,3 +16,23 @@ Summarize the following snippet in **30 words or less**, focusing on clarity and
   const response = result.response;
   return response.text().trim();
 }
+
+export async function* streamSummary(text: string) {
+    try {
+      const model = genAI.getGenerativeModel({ model: 'models/gemini-2.5-pro'});
+  
+      const result = await model.generateContentStream([
+        {
+          text: `Summarize the following content in a clear and concise paragraph:\n\n"${text}"`,
+        },
+      ]);
+  
+      for await (const chunk of result.stream) {
+        const part = chunk.text();
+        if (part) yield part;
+      }
+    } catch (err) {
+      console.error('Gemini streaming error:', err);
+      throw err;
+    }
+  }

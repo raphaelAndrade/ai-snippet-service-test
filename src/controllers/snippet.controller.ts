@@ -2,7 +2,26 @@ import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 
 import Snippet from '../models/snippet.model';
-import { summarizeText } from '../services/gemini.service'
+import { summarizeText, streamSummary } from '../services/gemini.service'
+
+export const streamSnippetSummary = async (req: AuthRequest, res: Response) => {
+    try {
+      const { text } = req.body;
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+  
+      for await (const chunk of streamSummary(text)) {
+        res.write(`data: ${chunk}\n\n`);
+      }
+  
+      res.end();
+    } catch (error) {
+      console.error('SSE Streaming Error:', error);
+      res.write(`event: error\ndata: ${JSON.stringify({ error: 'Streaming failed', details: error instanceof Error ? error.message : error })}\n\n`);
+      res.end();
+    }
+  };
 
 export const getSnippet = async (req: AuthRequest, res: Response) => {
   try {
