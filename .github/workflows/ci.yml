@@ -29,10 +29,14 @@ jobs:
       - name: Lint code
         run: npm run lint
 
-      # 5. Run tests
+      # 5. Run tests with env vars
       - name: Run tests
         run: npm test
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       # 6. Build Docker image
       - name: Build Docker image
-        run: docker build -t ai-snippet-service-backend
+        run: docker build -t ai-snippet-service-backend .
