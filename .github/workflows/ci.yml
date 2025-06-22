@@ -10,33 +10,38 @@ jobs:
   backend_ci_pipeline:
     runs-on: ubuntu-latest
 
+    services:
+      mongo:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongo --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      # 1. Code Checkout
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # 4. Lint
       - name: Lint code
         run: npm run lint
 
-      # 5. Run tests with env vars
       - name: Run tests
         run: npm test
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGO_URI: mongodb://localhost:27017/ai_snippets
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
-      # 6. Build Docker image
       - name: Build Docker image
         run: docker build -t ai-snippet-service-backend .
