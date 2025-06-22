@@ -6,4 +6,6 @@ RUN npm install
 
 COPY . .
 
+RUN npm install @google/generative-ai
+
 CMD ["npm", "run", "dev"]

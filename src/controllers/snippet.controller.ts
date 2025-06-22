@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import Snippet from '../models/snippet.model';
+import { summarizeText } from '../services/gemini.service'
 
 export const getSnippet: RequestHandler = async (req, res) => {
   try {
@@ -19,15 +20,23 @@ export const getSnippet: RequestHandler = async (req, res) => {
 };
 
 export const createSnippet: RequestHandler = async (req, res) => {
-  try {
-    const { text } = req.body;
-    const summary = 'stub-summary';
-    const snippet = await Snippet.create({ text, summary });
-    res.status(201).json({ id: snippet._id, text, summary });
-  } catch (err) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
+    try {
+      const { text } = req.body;
+  
+      const summary = await summarizeText(text);
+  
+      const snippet = await Snippet.create({ text, summary });
+  
+      res.status(201).json({
+        id: snippet._id,
+        text,
+        summary
+      });
+    } catch (error) {
+        console.error('Error creating snippet:', error);
+        res.status(500).json({ error: 'Internal server error', details: error instanceof Error ? error.message : error });
+      }
+  };
 
 export const listSnippets: RequestHandler = async (_req, res) => {
   try {

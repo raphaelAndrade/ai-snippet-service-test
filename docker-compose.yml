@@ -16,7 +16,7 @@ services:
       - .:/app
     environment:
       - MONGO_URI=${MONGO_URI}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     depends_on:
       - mongo
 
