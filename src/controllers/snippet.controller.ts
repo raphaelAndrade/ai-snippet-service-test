@@ -1,8 +1,10 @@
-import { RequestHandler } from 'express';
+import { Response } from 'express';
+import { AuthRequest } from '../middleware/auth.middleware';
+
 import Snippet from '../models/snippet.model';
 import { summarizeText } from '../services/gemini.service'
 
-export const getSnippet: RequestHandler = async (req, res) => {
+export const getSnippet = async (req: AuthRequest, res: Response) => {
   try {
     const snippet = await Snippet.findById(req.params.id);
     if (!snippet) {
@@ -19,13 +21,17 @@ export const getSnippet: RequestHandler = async (req, res) => {
   }
 };
 
-export const createSnippet: RequestHandler = async (req, res) => {
+export const createSnippet = async (req: AuthRequest, res: Response) => {
     try {
       const { text } = req.body;
   
       const summary = await summarizeText(text);
   
-      const snippet = await Snippet.create({ text, summary });
+      const snippet = await Snippet.create({
+        text,
+        summary,
+        ownerEmail: req.user?.email,
+      });
   
       res.status(201).json({
         id: snippet._id,
@@ -38,9 +44,12 @@ export const createSnippet: RequestHandler = async (req, res) => {
       }
   };
 
-export const listSnippets: RequestHandler = async (_req, res) => {
+export const listSnippets = async (req: AuthRequest, res: Response) => {
   try {
-    const snippets = await Snippet.find();
+    const filter = req.user?.role === 'admin'
+        ? {}
+        : { ownerEmail: req.user?.email };
+    const snippets = await Snippet.find(filter);
     res.json(
       snippets.map((s) => ({
         id: s._id,
