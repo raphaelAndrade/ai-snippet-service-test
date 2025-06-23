@@ -3,6 +3,7 @@ dotenv.config({ path: '.env.test' });
 
 import request from 'supertest';
 import app from '../app';
+import mongoose from 'mongoose'; // <- Adicionado
 
 describe('POST /snippets', () => {
   it('should create a snippet and return summary', async () => {
@@ -26,4 +27,9 @@ describe('POST /snippets', () => {
     expect(res.body).toHaveProperty('text'); // The original text should be returned
     expect(res.body).toHaveProperty('summary'); // The AI-generated summary should be returned
   }, 20000);
+});
+
+// <- Adicionado
+afterAll(async () => {
+  await mongoose.connection.close();
 });
